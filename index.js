@@ -5,14 +5,19 @@ const myserver = http.createServer((req, res) => {
   // getting to do
   if (req.url === "/getTODO") {
     fs.readFile("s.html", "utf-8", (err, data) => {
-      res.write(data);
-      res.end();
+      if (err) {
+        res.end("error handling");
+      } else {
+        res.write(data);
+        for (let i = 0; i < todos.length; i++) {
+          res.write(
+            `${todos[i]} <a href='/deleteTODO?index=${i}'>delete</a> </br>`
+          );
+        }
+        res.end();
+      }
     });
-  }
-
-  // creating to do
-  else if (req.url.includes("/postTODO")) {
-    console.log(req.url.split("?"));
+  } else if (req.url.includes("/postTODO")) {
     const splitData = req.url.split("?");
     const params = splitData[1];
     const paramsArr = params.split("&");
@@ -22,10 +27,11 @@ const myserver = http.createServer((req, res) => {
       const [key, value] = paramsArr[i].split("=");
       outputParams.set(key, value);
     }
-    console.log(outputParams);
     const createdTODO = outputParams.get("todo");
     todos.push(createdTODO);
-    res.write("data came thanku");
+    res.writeHead(301, {
+      location: "/getTODO",
+    });
     res.end();
   } else {
     console.log(req.url);
