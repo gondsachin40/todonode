@@ -1,6 +1,6 @@
 const http = require("http");
 const fs = require("fs");
-let todos = [];
+let todos = ["gourav", "sourav", "papita"];
 const myserver = http.createServer((req, res) => {
   // getting to do
   if (req.url === "/getTODO") {
@@ -30,6 +30,27 @@ const myserver = http.createServer((req, res) => {
     const createdTODO = outputParams.get("todo");
     todos.push(createdTODO);
     res.writeHead(301, {
+      location: "/getTODO",
+    });
+    res.end();
+  } else if (req.url.includes("/deleteTODO")) {
+    const splitt = req.url.split("=");
+    let indexx = parseInt(splitt[1]);
+    console.log(indexx);
+    console.log("todos", todos);
+    for (let i = indexx + 1; i < todos.length; i++) {
+      console.log("***inside loop***");
+      console.log(i, indexx);
+      let t = todos[indexx];
+      todos[indexx] = todos[i];
+      todos[i] = t;
+      console.log(todos);
+      indexx++;
+    }
+    console.log(todos);
+    todos.pop();
+    
+    res.writeHead(301,{
       location: "/getTODO",
     });
     res.end();
