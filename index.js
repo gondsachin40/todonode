@@ -17,22 +17,23 @@ const myserver = http.createServer((req, res) => {
         res.end();
       }
     });
-  } else if (req.url.includes("/postTODO")) {
-    const splitData = req.url.split("?");
-    const params = splitData[1];
-    const paramsArr = params.split("&");
-    const outputParams = new Map();
-    for (let i = 0; i < paramsArr.length; i++) {
-      console.log(paramsArr[i].split("="));
-      const [key, value] = paramsArr[i].split("=");
-      outputParams.set(key, value);
-    }
-    const createdTODO = outputParams.get("todo");
-    todos.push(createdTODO);
-    res.writeHead(301, {
-      location: "/getTODO",
+  } else if (req.url.includes("/postTODO") && req.method === "POST") {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
     });
-    res.end();
+    req.on("end", () => {
+      const todo = body.split("=")[1];
+      try {
+        todos.push(todo);
+        res.writeHead(301, {
+          location: "/getTODO",
+        });
+      } catch (err) {
+        console.error("Invalid JSON");
+      }
+      res.end("POST request received");
+    });
   } else if (req.url.includes("/deleteTODO")) {
     const splitt = req.url.split("=");
     let indexx = parseInt(splitt[1]);
